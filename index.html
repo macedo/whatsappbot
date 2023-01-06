@@ -8,5 +8,28 @@
 </head>
 <body>
   <h1>{{.H1}}</h1>
+  <script>
+    let ws = new WebSocket("ws://localhost:8080/ws")
+
+    ws.onopen = () => {
+      console.log("connection open");
+
+      setInterval(() => {
+        ws.send((Math.random() + 1).toString(36).substring(7));
+      }, 3000);
+    };
+
+    ws.onclose = () =>  {
+      console.log("connection closed");
+    };
+
+    ws.onerror = (error) => {
+      console.log("connection error ", error);
+    };
+
+    ws.onmessage = (message) => {
+      console.log("connection received ", message);
+    };
+  </script>
 </body>
 </html>

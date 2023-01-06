@@ -17,29 +17,14 @@ var l *log.Logger
 
 var tmpl *template.Template
 
-type TmplData struct {
-	H1 string
-}
-
-func HomePage(w http.ResponseWriter, r *http.Request) {
-	data := &TmplData{
-		H1: "Oie",
-	}
-
-	err := tmpl.Execute(w, data)
-	if err != nil {
-		http.Error(w, "Ooops", http.StatusBadRequest)
-		return
-	}
-}
-
 func main() {
-	l = log.New(os.Stdout, "server", log.LstdFlags)
+	l = log.New(os.Stdout, "", log.LstdFlags)
 
 	tmpl = template.Must(template.ParseFiles("index.html"))
 
 	router := mux.NewRouter()
 	router.HandleFunc("/", HomePage).Methods("GET")
+	router.HandleFunc("/ws", WS)
 
 	srv := &http.Server{
 		Addr:         ":8080",
