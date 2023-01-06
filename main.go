@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"html/template"
 	"log"
 	"net/http"
 	"os"
@@ -10,17 +9,17 @@ import (
 	"syscall"
 	"time"
 
+	_ "github.com/mattn/go-sqlite3"
 	"github.com/gorilla/mux"
+	"go.mau.fi/whatsmeow/store/sqlstore"
 )
+
+var container *sqlstore.Container
 
 var l *log.Logger
 
-var tmpl *template.Template
-
 func main() {
 	l = log.New(os.Stdout, "", log.LstdFlags)
-
-	tmpl = template.Must(template.ParseFiles("index.html"))
 
 	router := mux.NewRouter()
 	router.HandleFunc("/", HomePage).Methods("GET")
