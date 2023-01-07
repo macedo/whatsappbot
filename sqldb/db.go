@@ -3,18 +3,21 @@ package sqldb
 import (
 	"database/sql"
 	"log"
+	"os"
 
 	_ "github.com/mattn/go-sqlite3"
 )
 
 var DB *sql.DB
 
-func init() {
-	var err error
+var l *log.Logger
 
-	db, err := sql.Open("sqlite3", "whatsappbot.db?foreign_keys=on")
+func init() {
+	l = log.New(os.Stdout, "db", log.LstdFlags)
+
+	db, err := sql.Open("sqlite3", "file:whatsappbot.db?foreign_keys=on")
 	if err != nil {
-		log.Fatal(err)
+		l.Fatal(err)
 	}
 
 	DB = db

@@ -9,17 +9,14 @@ import (
 	"syscall"
 	"time"
 
-	_ "github.com/mattn/go-sqlite3"
 	"github.com/gorilla/mux"
-	"go.mau.fi/whatsmeow/store/sqlstore"
+	"github.com/macedo/whatsappbot/whatsapp"
 )
-
-var container *sqlstore.Container
 
 var l *log.Logger
 
 func main() {
-	l = log.New(os.Stdout, "", log.LstdFlags)
+	l = log.New(os.Stdout, "server", log.LstdFlags)
 
 	router := mux.NewRouter()
 	router.HandleFunc("/", HomePage).Methods("GET")
@@ -33,7 +30,12 @@ func main() {
 		WriteTimeout: 1 * time.Second,
 	}
 
+	if err := whatsapp.Connect(); err != nil {
+		l.Fatal(err)
+	}
+
 	go func() {
+		l.Printf("listening on %s", srv.Addr)
 		err := srv.ListenAndServe()
 		if err != nil {
 			l.Fatal(err)
@@ -41,13 +43,13 @@ func main() {
 	}()
 
 	sigCh := make(chan os.Signal, 1)
-	signal.Notify(sigCh, os.Interrupt)
-	signal.Notify(sigCh, syscall.SIGTERM)
+	signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM)
 	sig := <-sigCh
 	l.Println("received terminate, graceful shutdown", sig)
 
 	timeotCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
+	whatsapp.Disconnect()
 	srv.Shutdown((timeotCtx))
 }

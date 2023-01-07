@@ -1,56 +1,64 @@
 package whatsapp
 
 import (
-	"fmt"
+	"log"
+	"os"
 
 	"github.com/macedo/whatsappbot/sqldb"
-	"go.mau.fi/whatsmeow"
 	"go.mau.fi/whatsmeow/store"
 	"go.mau.fi/whatsmeow/store/sqlstore"
-	"go.mau.fi/whatsmeow/types/events"
-	waLog "go.mau.fi/whatsmeow/util/log"
 )
 
-var clients map[string]*whatsmeow.Client
+var clients []*Client
 
 var container *sqlstore.Container
 
-var Devices []*sqlstore.Container
+var l *log.Logger
+
+func init() {
+	l = log.New(os.Stdout, "whatsapp", log.LstdFlags)
+
+	container = sqlstore.NewWithDB(sqldb.DB, "sqlite3", nil)
+	if err := container.Upgrade(); err != nil {
+		log.Fatal(err)
+	}
+}
 
 func Connect() error {
-	container = sqlstore.NewWithDB(sqldb.DB, "sqlite3", nil)
-
 	devices, err := container.GetAllDevices()
 	if err != nil {
 		return err
 	}
+	l.Printf("devices found (%d)", len(devices))
 
-	for _, device := range devices {
-		id := device.ID.String()
+	for _, d := range devices {
+		c := NewClient(d)
+		clients = append(clients, c)
 
-		clients[id] = whatsmeow.NewClient(
-			device,
-			waLog.Stdout(fmt.Sprintf("DEVICE-%s", id), "DEBUG", true),
-		)
-		go func() {
-			clients[id].AddEventHandler(echoHandler)
-			err := clients[id].Connect()
-			if err != nil {
-				panic(err)
-			}
-		}()
+		if err := c.Connect(); err != nil {
+			l.Printf("device-%s could not connect", c.Store.ID.String())
+		}
 	}
 
 	return nil
 }
 
-func NewDevice() *store.Device {
-	return container.NewDevice()
+func Disconnect() {
+	for _, c := range clients {
+		c.Disconnect()
+	}
 }
 
-func echoHandler(evt interface{}) {
-	switch v := evt.(type) {
-	case *events.Message:
-		fmt.Println("Received Message", v.Message.GetConversation())
+func Clients() []*Client {
+	return clients
+}
+
+func Devices() []*store.Device {
+	devices := []*store.Device{}
+
+	for _, cli := range clients {
+		devices = append(devices, cli.Store)
 	}
+
+	return devices
 }
