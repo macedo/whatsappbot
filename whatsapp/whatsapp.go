@@ -32,15 +32,19 @@ func Connect() error {
 	l.Printf("devices found (%d)", len(devices))
 
 	for _, d := range devices {
-		c := NewClient(d)
-		clients = append(clients, c)
-
-		if err := c.Connect(); err != nil {
-			l.Printf("device-%s could not connect", c.Store.ID.String())
+		if err := ConnectDevice(d); err != nil {
+			l.Printf("device-%s could not connect", d.ID)
 		}
 	}
 
 	return nil
+}
+
+func ConnectDevice(d *store.Device) error {
+	c := NewClient(d)
+	clients = append(clients, c)
+
+	return c.Connect()
 }
 
 func Disconnect() {
@@ -51,14 +55,4 @@ func Disconnect() {
 
 func Clients() []*Client {
 	return clients
-}
-
-func Devices() []*store.Device {
-	devices := []*store.Device{}
-
-	for _, cli := range clients {
-		devices = append(devices, cli.Store)
-	}
-
-	return devices
 }

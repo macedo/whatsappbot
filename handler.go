@@ -18,7 +18,7 @@ type qrcodeEvent struct {
 	Type string `json:"type"`
 }
 
-type timeoutEvent struct {
+type event struct {
 	Type string `json:"type"`
 }
 
@@ -47,38 +47,42 @@ func WS(w http.ResponseWriter, r *http.Request) {
 	}
 	defer ws.Close()
 
-	// client := whatsapp.NewClient()
+	client := whatsapp.NewClient(nil)
 
-	// qrCh, err := client.GetQRChannel(r.Context())
-	// if err != nil {
-	// 	panic(err)
-	// }
+	qrCh, err := client.GetQRChannel(r.Context())
+	if err != nil {
+		panic(err)
+	}
 
-	// client.Log = waLog.Stdout("asd", "DEBUG", true)
+	if err := client.Connect(); err != nil {
+		panic(err)
+	}
 
-	// if err := client.Connect(); err != nil {
-	// 	panic(err)
-	// }
+	for item := range qrCh {
+		l.Printf("event %s", item.Event)
+		switch evt := item.Event; evt {
+		case "code":
+			ws.WriteJSON(&qrcodeEvent{
+				Code: item.Code,
+				Type: "qrcode",
+			})
 
-	// for item := range qrCh {
-	// 	l.Printf("event %s", item.Event)
-	// 	switch evt := item.Event; evt {
-	// 	case "code":
-	// 		ws.WriteJSON(&qrcodeEvent{
-	// 			Code: item.Code,
-	// 			Type: "qrcode",
-	// 		})
-	// 	case "success":
+		case "success":
+			l.Printf("connected new device - %s", client.Store.ID)
+			client.Disconnect()
+			whatsapp.ConnectDevice(client.Store)
+			ws.WriteJSON(&event{
+				Type: "success",
+			})
+			ws.Close()
 
-	// 	case "timeout":
-	// 		ws.WriteJSON(&timeoutEvent{
-	// 			Type: "timeout",
-	// 		})
-	// 		ws.Close()
-	// 	default:
-	// 	}
-	// }
-
+		default:
+			ws.WriteJSON(&event{
+				Type: evt,
+			})
+			ws.Close()
+		}
+	}
 }
 
 func renderPage(w io.Writer, data any) error {

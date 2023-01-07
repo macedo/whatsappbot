@@ -21,7 +21,7 @@
           <div class="row g-5">
             <div class="col-md-8">
               <h2 class="pb-2">Connected Devices</h2>
-              <table class="table">
+              <table class="table" id="connected-devices">
                 <thead>
                   <tr>
                     <th scope="col">JID</th>
@@ -73,6 +73,7 @@
         .addEventListener("click", (evt) => {
           let btn = evt.target;
           let canvas = document.getElementById("qrcode");
+          let table = document.getElementById("connected-device");
 
           btn.disabled = true;
 
@@ -104,6 +105,11 @@
                   size: 300,
                   value: data.code
                 })
+                break;
+
+              case "success":
+                btn.disable = false;
+                location.reload();
                 break;
 
               case "timeout":

@@ -28,7 +28,15 @@ type Client struct {
 }
 
 func NewClient(d *store.Device) *Client {
-	cliLog := waLog.Stdout(fmt.Sprintf("DEVICE-%s", d.ID.String()), "DEBUG", true)
+	var id string
+	if d == nil {
+		d = container.NewDevice()
+		id = "NEW"
+	} else {
+		id = d.ID.String()
+	}
+
+	cliLog := waLog.Stdout(fmt.Sprintf("DEVICE-%s", id), "DEBUG", true)
 	waCli := whatsmeow.NewClient(d, cliLog)
 
 	return &Client{waCli}
