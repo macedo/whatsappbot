@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"log"
 	"net/http"
 	"os"
@@ -13,7 +14,14 @@ import (
 	"github.com/macedo/whatsappbot/whatsapp"
 )
 
+var debug bool
+
 var l *log.Logger
+
+func init() {
+	flag.BoolVar(&debug, "debug", false, "enable debug mode")
+	flag.Parse()
+}
 
 func main() {
 	l = log.New(os.Stdout, "server", log.LstdFlags)
@@ -30,7 +38,8 @@ func main() {
 		WriteTimeout: 1 * time.Second,
 	}
 
-	if err := whatsapp.Connect(); err != nil {
+	opts := &whatsapp.ConnectOptions{Debug: debug}
+	if err := whatsapp.Connect(opts); err != nil {
 		l.Fatal(err)
 	}
 

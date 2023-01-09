@@ -51,11 +51,13 @@ func WS(w http.ResponseWriter, r *http.Request) {
 
 	qrCh, err := client.GetQRChannel(r.Context())
 	if err != nil {
-		panic(err)
+		l.Println("error requesting for new qrcode - ", err)
+		ws.Close()
 	}
 
 	if err := client.Connect(); err != nil {
-		panic(err)
+		l.Println("error connecting new device - ", err)
+		ws.Close()
 	}
 
 	for item := range qrCh {
@@ -69,8 +71,8 @@ func WS(w http.ResponseWriter, r *http.Request) {
 
 		case "success":
 			l.Printf("connected new device - %s", client.Store.ID)
-			client.Disconnect()
 			whatsapp.ConnectDevice(client.Store)
+			client.Disconnect()
 			ws.WriteJSON(&event{
 				Type: "success",
 			})

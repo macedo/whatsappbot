@@ -7,6 +7,7 @@ import (
 	"github.com/macedo/whatsappbot/sqldb"
 	"go.mau.fi/whatsmeow/store"
 	"go.mau.fi/whatsmeow/store/sqlstore"
+	waLog "go.mau.fi/whatsmeow/util/log"
 )
 
 var clients []*Client
@@ -15,16 +16,29 @@ var container *sqlstore.Container
 
 var l *log.Logger
 
-func init() {
-	l = log.New(os.Stdout, "whatsapp", log.LstdFlags)
+var logLevel string
 
-	container = sqlstore.NewWithDB(sqldb.DB, "sqlite3", nil)
-	if err := container.Upgrade(); err != nil {
-		log.Fatal(err)
-	}
+type ConnectOptions struct {
+	Debug bool
 }
 
-func Connect() error {
+func init() {
+	logLevel = "INFO"
+}
+
+func Connect(opts *ConnectOptions) error {
+	if opts.Debug {
+		logLevel = "DEBUG"
+	}
+
+	l = log.New(os.Stdout, "whatsapp", log.LstdFlags)
+
+	dbLog := waLog.Stdout("DATABASE", logLevel, true)
+	container = sqlstore.NewWithDB(sqldb.DB, sqldb.Provider, dbLog)
+	if err := container.Upgrade(); err != nil {
+		return err
+	}
+
 	devices, err := container.GetAllDevices()
 	if err != nil {
 		return err

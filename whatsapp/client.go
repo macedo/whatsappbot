@@ -36,7 +36,7 @@ func NewClient(d *store.Device) *Client {
 		id = d.ID.String()
 	}
 
-	cliLog := waLog.Stdout(fmt.Sprintf("DEVICE-%s", id), "DEBUG", true)
+	cliLog := waLog.Stdout(fmt.Sprintf("DEVICE-%s", id), logLevel, true)
 	waCli := whatsmeow.NewClient(d, cliLog)
 
 	return &Client{waCli}

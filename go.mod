@@ -9,6 +9,8 @@ require (
 	go.mau.fi/whatsmeow v0.0.0-20230104001256-9d98dc9b5702
 )
 
+require github.com/lib/pq v1.10.7
+
 require (
 	filippo.io/edwards25519 v1.0.0 // indirect
 	github.com/mattn/go-sqlite3 v1.14.16
