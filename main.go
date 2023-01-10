@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/macedo/whatsappbot/handlers"
 	"github.com/macedo/whatsappbot/whatsapp"
 )
 
@@ -27,8 +28,8 @@ func main() {
 	l = log.New(os.Stdout, "server", log.LstdFlags)
 
 	router := mux.NewRouter()
-	router.HandleFunc("/", HomePage).Methods("GET")
-	router.HandleFunc("/ws", WS)
+	router.HandleFunc("/", handlers.HomePage()).Methods("GET")
+	router.HandleFunc("/connect-device", handlers.ConnectDevice(l))
 
 	srv := &http.Server{
 		Addr:         ":8080",
