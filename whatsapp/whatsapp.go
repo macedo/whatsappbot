@@ -5,10 +5,6 @@ import (
 	"os"
 
 	"github.com/macedo/whatsappbot/sqldb"
-	"github.com/olebedev/when"
-	"github.com/olebedev/when/rules"
-	"github.com/olebedev/when/rules/br"
-	"github.com/olebedev/when/rules/common"
 	"go.mau.fi/whatsmeow/store"
 	"go.mau.fi/whatsmeow/store/sqlstore"
 	waLog "go.mau.fi/whatsmeow/util/log"
@@ -22,20 +18,12 @@ var l *log.Logger
 
 var logLevel string
 
-var nlDTParser *when.Parser
-
 type ConnectOptions struct {
 	Debug bool
 }
 
 func init() {
 	logLevel = "INFO"
-
-	nlDTParser = when.New(&rules.Options{
-		Distance: 10,
-	})
-	nlDTParser.Add(common.All...)
-	nlDTParser.Add(br.All...)
 }
 
 func Connect(opts *ConnectOptions) error {

@@ -16,6 +16,7 @@ require (
 
 require (
 	github.com/AlekSi/pointer v1.0.0 // indirect
+	github.com/goodsign/monday v1.0.0 // indirect
 	github.com/pkg/errors v0.8.1 // indirect
 	github.com/stretchr/testify v1.7.0 // indirect
 )
@@ -23,6 +24,7 @@ require (
 require (
 	filippo.io/edwards25519 v1.0.0 // indirect
 	github.com/mattn/go-sqlite3 v1.14.16
+	github.com/procyon-projects/chrono v1.1.2
 	go.mau.fi/libsignal v0.1.0 // indirect
 	golang.org/x/crypto v0.4.0 // indirect
 	google.golang.org/protobuf v1.28.1

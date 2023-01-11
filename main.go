@@ -12,6 +12,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/macedo/whatsappbot/handlers"
+	"github.com/macedo/whatsappbot/scheduler"
 	"github.com/macedo/whatsappbot/whatsapp"
 )
 
@@ -38,6 +39,9 @@ func main() {
 		ReadTimeout:  1 * time.Second,
 		WriteTimeout: 1 * time.Second,
 	}
+
+	scheduler.Start()
+	defer scheduler.Shutdown()
 
 	opts := &whatsapp.ConnectOptions{Debug: debug}
 	if err := whatsapp.Connect(opts); err != nil {
