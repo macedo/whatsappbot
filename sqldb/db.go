@@ -11,14 +11,22 @@ import (
 
 var DB *sql.DB
 
-var Provider = "postgres"
+var DSN string
+
+var Provider string
 
 var l *log.Logger
 
 func init() {
 	l = log.New(os.Stdout, "db", log.LstdFlags)
 
-	db, err := sql.Open(Provider, "postgres://postgres:postgres@localhost:5432/whatsappbot?sslmode=disable&timezone=UTC&connect_timeout=5")
+	if DSN = os.Getenv("DATABASE_URL"); DSN == "" {
+		DSN = "postgres://postgres:postgres@localhost:5432/whatsappbot?sslmode=disable&timezone=UTC&connect_timeout=5"
+	}
+
+	Provider = "postgres"
+
+	db, err := sql.Open(Provider, DSN)
 	if err != nil {
 		l.Fatal(err)
 	}
