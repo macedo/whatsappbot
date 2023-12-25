@@ -13,6 +13,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	_ "github.com/lib/pq"
 	"github.com/macedo/whatsappbot/internal/handler"
 	"github.com/macedo/whatsappbot/internal/storage"
 	"github.com/mdp/qrterminal"
