@@ -30,8 +30,6 @@ var (
 		Use:   "start",
 		Short: "Starts whatsappbot",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			log = waLog.Stdout("main", "INFO", true)
-
 			s3Storage := storage.NewS3(newS3Client(), appConfig.Bucket)
 
 			container, err := sqlstore.New("postgres", appConfig.DatabaseURL, waLog.Stdout("database", "INFO", true))

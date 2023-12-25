@@ -29,6 +29,7 @@ func Execute() error {
 func init() {
 	rootCmd.CompletionOptions.DisableDefaultCmd = true
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is app.env)")
+	log = waLog.Stdout("main", "INFO", true)
 	cobra.OnInitialize(initConfig)
 }
 
@@ -49,7 +50,7 @@ func initConfig() {
 		os.Exit(1)
 	}
 
-	log.Infof("Using config file:", viper.ConfigFileUsed())
+	log.Infof("Using config file: %s", viper.ConfigFileUsed())
 
 	if err := viper.Unmarshal(appConfig); err != nil {
 		log.Errorf("failed to unmarshal config.\n"+
