@@ -21,12 +21,12 @@ type MediaDownloadHandler struct {
 
 func NewMediaDownloadHandler(
 	cli *whatsmeow.Client,
-	jids []string,
+	jids string,
 	s storage.Backend,
 	l waLog.Logger) *MediaDownloadHandler {
 	return &MediaDownloadHandler{
 		cli:     cli,
-		jids:    jids,
+		jids:    strings.Split(jids, ","),
 		log:     l,
 		storage: s,
 	}
