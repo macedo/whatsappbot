@@ -4,7 +4,7 @@ APPLICATION_NAME ?= whatsappbot
 VERSION=$(shell cat VERSION)
 
 build:
-	docker build --tag ghcr.io/${GITHUB_USERNAME}/${APPLICATION_NAME}:${VERSION} .
+	docker build --platform=linux/arm64 --tag ghcr.io/${GITHUB_USERNAME}/${APPLICATION_NAME}:${VERSION} .
 
 push:
 	docker push ghcr.io/${GITHUB_USERNAME}/${APPLICATION_NAME}:${VERSION}
