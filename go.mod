@@ -7,6 +7,7 @@ require (
 	github.com/lib/pq v1.10.9
 	github.com/mdp/qrterminal v1.0.1
 	github.com/spf13/viper v1.18.2
+	google.golang.org/protobuf v1.31.0
 )
 
 require (
@@ -31,7 +32,6 @@ require (
 	go.mau.fi/libsignal v0.1.0 // indirect
 	go.mau.fi/util v0.2.0 // indirect
 	golang.org/x/crypto v0.16.0 // indirect
-	google.golang.org/protobuf v1.31.0 // indirect
 	rsc.io/qr v0.2.0 // indirect
 )
 
