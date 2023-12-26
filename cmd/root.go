@@ -5,7 +5,9 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"go.mau.fi/whatsmeow/store"
 	waLog "go.mau.fi/whatsmeow/util/log"
+	"google.golang.org/protobuf/proto"
 )
 
 var (
@@ -30,6 +32,7 @@ func init() {
 	rootCmd.CompletionOptions.DisableDefaultCmd = true
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is app.env)")
 	log = waLog.Stdout("main", "INFO", true)
+	store.DeviceProps.Os = proto.String("WhatsApp Bot")
 	cobra.OnInitialize(initConfig)
 }
 
