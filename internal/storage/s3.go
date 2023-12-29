@@ -3,8 +3,10 @@ package storage
 import (
 	"bytes"
 	"context"
+	"log"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
@@ -13,10 +15,24 @@ type S3 struct {
 	Bucket string
 }
 
-func NewS3(cli *s3.Client, bucket string) *S3 {
+type S3Attributes struct {
+	Bucket           string   `mapstructure:"bucket"`
+	ConfigFiles      []string `mapstructure:"config_files"`
+	CredentialsFiles []string `mapstructure:"config_credentials"`
+}
+
+func NewS3(attrs S3Attributes) *S3 {
+	cfg, err := config.LoadDefaultConfig(context.Background(),
+		config.WithSharedConfigFiles(attrs.ConfigFiles),
+		config.WithSharedCredentialsFiles(attrs.CredentialsFiles),
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	return &S3{
-		client: cli,
-		Bucket: bucket,
+		client: s3.NewFromConfig(cfg),
+		Bucket: attrs.Bucket,
 	}
 }
 

@@ -3,6 +3,7 @@ package cmd
 import (
 	"os"
 
+	"github.com/macedo/whatsappbot/internal/config"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"go.mau.fi/whatsmeow/store"
@@ -13,7 +14,7 @@ import (
 var (
 	cfgFile string
 
-	appConfig = &AppConfig{}
+	appConfig = &config.AppConfig{}
 
 	log waLog.Logger
 
@@ -30,7 +31,7 @@ func Execute() error {
 
 func init() {
 	rootCmd.CompletionOptions.DisableDefaultCmd = true
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is app.env)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is config.yaml)")
 	log = waLog.Stdout("main", "INFO", true)
 	store.DeviceProps.Os = proto.String("WhatsApp Bot")
 	cobra.OnInitialize(initConfig)
@@ -41,8 +42,8 @@ func initConfig() {
 		viper.SetConfigFile(cfgFile)
 	} else {
 		viper.AddConfigPath(".")
-		viper.SetConfigName("app")
-		viper.SetConfigType("env")
+		viper.SetConfigName("config")
+		viper.SetConfigType("yaml")
 	}
 
 	viper.AutomaticEnv()

@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 
+	_ "github.com/lib/pq"
 	"github.com/macedo/whatsappbot/cmd"
 )
 

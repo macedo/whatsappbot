@@ -1,27 +1,14 @@
-/*
-Copyright © 2023 NAME HERE <EMAIL ADDRESS>
-*/
 package cmd
 
 import (
 	"context"
-	"errors"
-	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
 
-	"github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/service/s3"
-	_ "github.com/lib/pq"
 	"github.com/macedo/whatsappbot/internal/handler"
-	"github.com/macedo/whatsappbot/internal/storage"
-	"github.com/mdp/qrterminal"
+	"github.com/macedo/whatsappbot/internal/whatsapp"
 	"github.com/spf13/cobra"
-	"go.mau.fi/whatsmeow"
-	"go.mau.fi/whatsmeow/store/sqlstore"
-	"go.mau.fi/whatsmeow/types"
-	waLog "go.mau.fi/whatsmeow/util/log"
 )
 
 // startCmd represents the start command
@@ -30,51 +17,16 @@ var (
 		Use:   "start",
 		Short: "Starts whatsappbot",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			s3Storage := storage.NewS3(newS3Client(), appConfig.Bucket)
-
-			container, err := sqlstore.New("postgres", appConfig.DatabaseURL, waLog.Stdout("database", "INFO", true))
+			bot, err := whatsapp.NewBot(appConfig.DB, log)
 			if err != nil {
-				return fmt.Errorf("failed to connect to database %q. \n"+
-					"here's what happened': %v", appConfig.DatabaseURL, err)
+				return err
 			}
+			defer bot.Disconnect()
 
-			device, err := container.GetFirstDevice()
-			if err != nil {
-				return fmt.Errorf("failed to get device.\n"+
-					"here's what happened: %v", err)
-			}
+			handler.Initialize(appConfig.Handlers, bot)
 
-			client := whatsmeow.NewClient(device, waLog.Stdout("client", "INFO", true))
-			client.PrePairCallback = func(jid types.JID, platform, businessName string) bool {
-				log.Infof("pairing %s (platform: %q, business name: %q)", platform, businessName)
-				return true
-			}
-
-			ch, err := client.GetQRChannel(context.Background())
-			if err != nil {
-				if !errors.Is(err, whatsmeow.ErrQRStoreContainsID) {
-					log.Errorf("failed to get qr channel from device.\n"+
-						"here's what happened: %v", err)
-				}
-			} else {
-				go func() {
-					for evt := range ch {
-						if evt.Event == "code" {
-							qrterminal.GenerateHalfBlock(evt.Code, qrterminal.L, os.Stdout)
-						} else {
-							log.Infof("qr channel result %s", evt.Event)
-						}
-					}
-				}()
-			}
-
-			mediaDownload := handler.NewMediaDownloadHandler(client, appConfig.JIDs, s3Storage, log)
-			client.AddEventHandler(mediaDownload.HandlerFunc())
-
-			if err := client.Connect(); err != nil {
-				log.Errorf("failed to connect to device %q.\n"+
-					"here's what happened: %v", device.ID, err)
-				os.Exit(1)
+			if err := bot.Connect(context.Background()); err != nil {
+				return err
 			}
 
 			c := make(chan os.Signal, 1)
@@ -82,24 +34,12 @@ var (
 
 			<-c
 			log.Infof("interrupt received, exiting")
-			client.Disconnect()
 			log.Infof("bye")
 
 			return nil
 		},
 	}
 )
-
-func newS3Client() *s3.Client {
-	cfg, err := config.LoadDefaultConfig(context.Background())
-	if err != nil {
-		log.Errorf("failed to load aws default config.\n"+
-			"here's what happened: %v", err)
-		os.Exit(1)
-	}
-
-	return s3.NewFromConfig(cfg)
-}
 
 func init() {
 	rootCmd.AddCommand(startCmd)
