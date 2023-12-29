@@ -1,0 +1,22 @@
+database:
+  host: localhost
+  name: zapzap
+  password: zapzap
+  port: 5432
+  provider: postgres
+  user: zapzap
+
+handlers:
+  media_download:
+    enabled: true
+    jids:
+      - 553491199989@s.whatsapp.net
+      - 553591963661@s.whatsapp.net
+    storage:
+      service: 
+        s3:
+          bucket: whatsapp-media-downloader
+          config_files:
+            - .aws/config
+          credentials_files: 
+            - .aws/credentials

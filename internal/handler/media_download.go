@@ -19,20 +19,24 @@ type MediaDownloadHandler struct {
 	storage storage.Backend
 }
 
-func NewMediaDownloadHandler(
-	cli *whatsmeow.Client,
-	jids string,
-	s storage.Backend,
-	l waLog.Logger) *MediaDownloadHandler {
+type MediaDownloadAttributes struct {
+	Enabled bool     `mapstructure:"enabled"`
+	JIDs    []string `mapstructure:"jids"`
+	Storage struct {
+		Service map[string]any `mapstructure:"service"`
+	} `mapstructure:"storage"`
+}
+
+func NewMediaDownloadHandler(cli *whatsmeow.Client, attrs MediaDownloadAttributes) *MediaDownloadHandler {
 	return &MediaDownloadHandler{
 		cli:     cli,
-		jids:    strings.Split(jids, ","),
-		log:     l,
-		storage: s,
+		jids:    attrs.JIDs,
+		log:     waLog.Stdout("media_download", "INFO", true),
+		storage: storage.New(attrs.Storage.Service),
 	}
 }
 
-func (h *MediaDownloadHandler) HandlerFunc() func(any) {
+func (h *MediaDownloadHandler) EventHandler() func(any) {
 	return func(rawEvt any) {
 		switch evt := rawEvt.(type) {
 		case *events.Message:
