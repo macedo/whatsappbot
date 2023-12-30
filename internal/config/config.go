@@ -13,7 +13,7 @@ type DatabaseConfig struct {
 
 func (dc *DatabaseConfig) DNS() string {
 	return fmt.Sprintf(
-		"%s://%s:%s@%s:%s/%s",
+		"%s://%s:%s@%s:%s/%s?sslmode=disable",
 		dc.Provider,
 		dc.User,
 		dc.Password,
