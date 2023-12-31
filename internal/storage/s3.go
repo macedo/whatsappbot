@@ -3,6 +3,7 @@ package storage
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"log"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -18,10 +19,11 @@ type S3 struct {
 type S3Attributes struct {
 	Bucket           string   `mapstructure:"bucket"`
 	ConfigFiles      []string `mapstructure:"config_files"`
-	CredentialsFiles []string `mapstructure:"config_credentials"`
+	CredentialsFiles []string `mapstructure:"credentials_files"`
 }
 
 func NewS3(attrs S3Attributes) *S3 {
+	fmt.Printf("%+v", attrs)
 	cfg, err := config.LoadDefaultConfig(context.Background(),
 		config.WithSharedConfigFiles(attrs.ConfigFiles),
 		config.WithSharedCredentialsFiles(attrs.CredentialsFiles),
