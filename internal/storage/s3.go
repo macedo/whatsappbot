@@ -18,7 +18,7 @@ type S3 struct {
 type S3Attributes struct {
 	Bucket           string   `mapstructure:"bucket"`
 	ConfigFiles      []string `mapstructure:"config_files"`
-	CredentialsFiles []string `mapstructure:"config_credentials"`
+	CredentialsFiles []string `mapstructure:"credentials_files"`
 }
 
 func NewS3(attrs S3Attributes) *S3 {

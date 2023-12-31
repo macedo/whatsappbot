@@ -58,6 +58,7 @@ func (h *MediaDownloadHandler) EventHandler() func(any) {
 					if err := h.storage.Save(context.Background(), path, data); err != nil {
 						h.log.Errorf("Failed to save document %q.\n"+
 							"Here's what happened: %v", *document.FileName, err)
+						return
 					}
 
 					h.log.Infof("uploaded %q", path)
