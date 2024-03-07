@@ -7,16 +7,20 @@ database:
   user: zapzap
 
 handlers:
+  debug:
+    enabled: true
+    jids:
+      - 553591963661@s.whatsapp.net
   media_download:
     enabled: true
     jids:
       - 553491199989@s.whatsapp.net
       - 553591963661@s.whatsapp.net
     storage:
-      service: 
+      service:
         s3:
           bucket: whatsapp-media-downloader
           config_files:
             - .aws/config
-          credentials_files: 
+          credentials_files:
             - .aws/credentials
