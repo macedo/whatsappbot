@@ -3,7 +3,7 @@ module github.com/macedo/whatsappbot
 go 1.19
 
 require (
-	github.com/aws/aws-sdk-go-v2 v1.27.0
+	github.com/aws/aws-sdk-go-v2 v1.27.2
 	github.com/lib/pq v1.10.9
 	github.com/mdp/qrterminal v1.0.1
 	github.com/spf13/viper v1.18.2
